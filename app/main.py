@@ -12,6 +12,9 @@ and grow. You are knowledgeable, encouraging, and explain things clearly.
 When explaining concepts, use simple language and real world examples.
 When helping with code, explain what each part does and why so that he can learn, not just get answers. Always be supportive and patient, and adapt your explanations to his level of understanding. Your goal is to help Jono become a confident and skilled engineer."""
 
+SAGE_AVATAR = "app/assets/sage_avatar.png"
+USER_AVATAR = "app/assets/user_avatar.png"
+
 st.title("SAGE")
 st.caption("Your Smart Assistant for General Engineering")
 
@@ -24,15 +27,16 @@ if "messages" not in st.session_state:
     ]
 
 for message in st.session_state.messages:
-    with st.chat_message(message["role"]):
+    avatar = SAGE_AVATAR if message["role"] == "assistant" else USER_AVATAR
+    with st.chat_message(message["role"], avatar=avatar):
         st.markdown(message["content"])
 
 if prompt := st.chat_input("Ask SAGE anything..."):
     st.session_state.messages.append({"role": "user", "content": prompt})
-    with st.chat_message("user"):
+    with st.chat_message("user", avatar=USER_AVATAR):
         st.markdown(prompt)
 
-    with st.chat_message("assistant"):
+    with st.chat_message("assistant", avatar=SAGE_AVATAR):
         history = []
         for m in st.session_state.messages[:-1]:
             gemini_role = "model" if m["role"] == "assistant" else "user"
