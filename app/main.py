@@ -18,11 +18,21 @@ USER_AVATAR = "app/assets/user_avatar.png"
 st.title("SAGE")
 st.caption("Your Smart Assistant for General Engineering")
 
+st.markdown("""
+    <style>
+    [data-testid="stChatMessageAvatarUser"] img,
+    [data-testid="stChatMessageAvatarAssistant"] img {
+        width: 45px !important;
+        height: 45px !important;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
 if "messages" not in st.session_state:
     st.session_state.messages = [
         {
             "role": "assistant",
-            "content": """Hello Jono Sir, What are focusing on today? I can help with anything from understanding concepts to writing code. Just ask!"""
+            "content": """Hello Jono Sir, What are focusing on today? I can help with anything from understanding concepts to writing code even telling you not to overthink things 🤣. Just ask!"""
         }
     ]
 
@@ -31,7 +41,12 @@ for message in st.session_state.messages:
     with st.chat_message(message["role"], avatar=avatar):
         st.markdown(message["content"])
 
-if prompt := st.chat_input("Ask SAGE anything..."):
+if len(st.session_state.messages) <= 2:
+    placeholder = "Type here to chat with SAGE..."
+else:
+    placeholder = "Reply to SAGE or ask something new..."
+
+if prompt := st.chat_input(placeholder):
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user", avatar=USER_AVATAR):
         st.markdown(prompt)
