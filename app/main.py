@@ -52,18 +52,19 @@ if prompt := st.chat_input(placeholder):
         st.markdown(prompt)
 
     with st.chat_message("assistant", avatar=SAGE_AVATAR):
-        history = []
-        for m in st.session_state.messages[:-1]:
-            gemini_role = "model" if m["role"] == "assistant" else "user"
-            history.append({
-                "role": gemini_role,
-                "parts": [{"text": m["content"]}]
-            })
+        with st.spinner("SAGE is thinking..."):
+            history = []
+            for m in st.session_state.messages[:-1]:
+                gemini_role = "model" if m["role"] == "assistant" else "user"
+                history.append({
+                    "role": gemini_role,
+                    "parts": [{"text": m["content"]}]
+                })
 
-        response = client.models.generate_content(
-            model="gemini-2.5-flash",
-            contents=history + [{"role": "user", "parts": [{"text": prompt}]}],
-            config={"system_instruction": SYSTEM_PROMPT}
-        )
+            response = client.models.generate_content(
+                model="gemini-2.5-flash",
+                contents=history + [{"role": "user", "parts": [{"text": prompt}]}],
+                config={"system_instruction": SYSTEM_PROMPT}
+         )
         st.markdown(response.text)
         st.session_state.messages.append({"role": "assistant", "content": response.text})
