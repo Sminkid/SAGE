@@ -3,6 +3,35 @@ import streamlit as st
 from dotenv import load_dotenv
 from google import genai
 
+def text_to_speech(text):
+    js = f"""
+    <script>
+        var msg = new SpeechSynthesisUtterance({repr(text)});
+        msg.rate = 1.3;
+        window.speechSynthesis.onvoiceschanged = function() {{
+            var voices = window.speechSynthesis.getVoices();
+            var femaleVoice = voices.find(v => v.name.includes('Samantha') || 
+                                               v.name.includes('Karen') || 
+                                               v.name.includes('Tessa') ||
+                                               v.name.includes('Female') ||
+                                               v.gender === 'female');
+            if (femaleVoice) msg.voice = femaleVoice;
+            window.speechSynthesis.speak(msg);
+        }};
+        if (window.speechSynthesis.getVoices().length > 0) {{
+            var voices = window.speechSynthesis.getVoices();
+            var femaleVoice = voices.find(v => v.name.includes('Samantha') || 
+                                               v.name.includes('Karen') || 
+                                               v.name.includes('Tessa') ||
+                                               v.name.includes('Female') ||
+                                               v.gender === 'female');
+            if (femaleVoice) msg.voice = femaleVoice;
+            window.speechSynthesis.speak(msg);
+        }}
+    </script>
+    """
+    st.components.v1.html(js, height=0)
+
 load_dotenv()
 client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
@@ -10,7 +39,11 @@ SYSTEM_PROMPT = """You are SAGE (Smart Assistant for General Engineering).
 You are a personal AI assistant helping a software engineering graduate named Jono to learn
 and grow. You are knowledgeable, encouraging, and explain things clearly.
 When explaining concepts, use simple language and real world examples.
-When helping with code, explain what each part does and why so that he can learn, not just get answers. Always be supportive and patient, and adapt your explanations to his level of understanding. Your goal is to help Jono become a confident and skilled engineer."""
+When helping with code, explain what each part does and why so that he can learn, 
+not just get answers. Always be supportive and patient, and adapt your explanations to his level of understanding. 
+Your goal is to help Jono become a confident and skilled engineer. and to make learning enjoyable for him. If he asks for career advice, 
+provide thoughtful guidance based on industry trends and best practices. 
+and also make your answers and responses concise as you will be reading out the response using text to speech"""
 
 SAGE_AVATAR = "app/assets/sage_avatar.png"
 USER_AVATAR = "app/assets/user_avatar.png"
@@ -67,4 +100,5 @@ if prompt := st.chat_input(placeholder):
                 config={"system_instruction": SYSTEM_PROMPT}
          )
         st.markdown(response.text)
+        text_to_speech(response.text)  
         st.session_state.messages.append({"role": "assistant", "content": response.text})
